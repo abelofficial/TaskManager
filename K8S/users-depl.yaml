@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platforms-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: usersservices
+  template:
+    metadata:
+      labels:
+        app: usersservices
+    spec:
+      containers:
+        - name: usersservices
+          image: abelofficial/usersservices:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: platforms-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: usersservices
+  ports:
+    - name: usersservices
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: plafromgrpc
+      protocol: TCP
+      port: 666
+      targetPort: 666
