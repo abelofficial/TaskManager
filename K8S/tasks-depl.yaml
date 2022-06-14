@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: users-depl
+  name: tasks-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: usersservices
+      app: tasksservices
   template:
     metadata:
       labels:
-        app: usersservices
+        app: tasksservices
     spec:
       containers:
-        - name: usersservices
-          image: abelofficial/usersservices:latest
+        - name: tasksservices
+          image: abelofficial/tasksservices:latest
