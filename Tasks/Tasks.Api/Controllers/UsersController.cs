@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tasks.Api.Data;
 using Tasks.Api.Models;
+using Tasks.Api.SyncDataServices.Http;
 
 namespace Users.Api.Controllers;
 
@@ -13,10 +14,13 @@ public class UsersController : ControllerBase
     private readonly ILogger<UsersController> _logger;
     private readonly TasksDbContext _dbContext;
 
-    public UsersController(ILogger<UsersController> logger, TasksDbContext dbContext)
+    private readonly ICommandDataClient _commandDataClient;
+
+    public UsersController(ILogger<UsersController> logger, TasksDbContext dbContext, ICommandDataClient commandDataClient)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _commandDataClient = commandDataClient;
     }
 
     [HttpGet("{id}")]
@@ -34,9 +38,19 @@ public class UsersController : ControllerBase
     [HttpPost(Name = "CreateUser")]
     public async Task<ActionResult> Create(User request)
     {
-        var result = _dbContext.Users.Add(request).Entity;
-        await _dbContext.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetOne), new { id = result.Id }, result.Id);
+        try
+        {
+            await _commandDataClient.SendPlatformToCommand(request);
+
+            var result = _dbContext.Users.Add(request).Entity;
+            await _dbContext.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetOne), new { id = result.Id }, result.Id);
+        }
+        catch (Exception)
+        {
+            return Problem();
+        }
     }
 }

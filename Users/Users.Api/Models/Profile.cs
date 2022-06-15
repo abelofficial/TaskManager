@@ -1,6 +1,5 @@
 
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace Users.Api.Models;
 
@@ -10,16 +9,10 @@ public class Profile
     [Required]
     public int Id { get; set; }
 
-    [Required]
-    public string? Email { get; set; }
-
-    [Required]
-    public string? IdentityId { get; set; }
 
     [Required]
     public AuthProvider Provider { get; set; }
 
-    [JsonIgnore]
     public virtual Account? Account { get; set; }
 }
 
